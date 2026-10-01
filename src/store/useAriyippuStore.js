@@ -78,7 +78,14 @@ export const useAriyippuStore = create(
         })),
       loadSample: () =>
         set((s) => ({
-          notice: { ...sampleNotice(), header: { ...sampleNotice().header, logoDataUrl: s.notice.header.logoDataUrl } },
+          notice: {
+            ...sampleNotice(),
+            header: {
+              ...sampleNotice().header,
+              logoMode: s.notice.header.logoMode,
+              logoDataUrl: s.notice.header.logoDataUrl,
+            },
+          },
           oversizedItemIds: [],
         })),
     }),

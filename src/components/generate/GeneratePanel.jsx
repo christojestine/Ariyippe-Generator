@@ -44,11 +44,13 @@ export function GeneratePanel() {
     setStatus("building");
     setError("");
     try {
-      const [{ buildAriyippuPdf }, { loadFontBytes }] = await Promise.all([
+      const [{ buildAriyippuPdf }, { loadFontBytes }, { resolveLogo }] = await Promise.all([
         import("../../lib/pdf/buildAriyippuPdf.js"),
         import("../../lib/pdf/loadFonts.js"),
+        import("../../lib/pdf/loadLogo.js"),
       ]);
-      const { doc, pageCount, oversizedItemIds } = buildAriyippuPdf(notice, await loadFontBytes());
+      const [fontBytes, logo] = await Promise.all([loadFontBytes(), resolveLogo(notice.header)]);
+      const { doc, pageCount, oversizedItemIds } = buildAriyippuPdf(notice, fontBytes, { logo });
       setOversizedItemIds(oversizedItemIds);
       setPdf({ url: URL.createObjectURL(doc.output("blob")), pageCount, oversized: oversizedItemIds.length });
       setStatus("ready");

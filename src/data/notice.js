@@ -11,6 +11,8 @@ let counter = 0;
 export const newId = () => `${Date.now().toString(36)}-${(counter++).toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 
 export const DEFAULT_HEADER = {
+  /** "default" = bundled church logo, "custom" = logoDataUrl, "none" = no logo */
+  logoMode: "default",
   logoDataUrl: "",
   churchName: "ST. MARY’S FORANE CHURCH",
   subtitle: "Shrine of the Nativity of Our Lady",

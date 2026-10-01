@@ -15,6 +15,8 @@ pnpm test       # unit tests (converter, transliteration, layout, pagination)
 2. Type each item in a section and press **Add item** (or <kbd>Ctrl</kbd>+<kbd>Enter</kbd>). Items stack up numbered; they can be edited, reordered or deleted.
 3. Click **Generate PDF**, check the summary, confirm, then download.
 
+The church logo ([src/assets/images/default-logo.png](src/assets/images/default-logo.png)) is printed by default. Under **Edit header, logo & signature** you can upload another logo or choose none. Logos are printed whole, never cropped.
+
 Work in progress is saved in the browser automatically. **Load sample** fills in the 27.09.2026 notice.
 
 ### Typing

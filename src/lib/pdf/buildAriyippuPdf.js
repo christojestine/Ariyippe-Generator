@@ -44,7 +44,7 @@ const SECTION_GAP = 14;
 
 /**
  * @typedef {object} Notice
- * @property {{ logoDataUrl?: string, churchName: string, subtitle: string, addressLine1: string, addressLine2: string, title: string }} header
+ * @property {{ logoMode?: "default" | "custom" | "none", logoDataUrl?: string, churchName: string, subtitle: string, addressLine1: string, addressLine2: string, title: string }} header
  * @property {string} noticeDate
  * @property {Array<{ id: string, kind: "numbered" | "bulleted" | "line", heading: object | null, items: Array<{ id: string, content: object }> }>} sections
  * @property {{ name: string, title: string }} signature
@@ -53,9 +53,12 @@ const SECTION_GAP = 14;
 /**
  * @param {Notice} notice
  * @param {import("./fonts.js").FontBytes} fontBytes
+ * @param {{ logo?: { data: string | Uint8Array, width: number, height: number } | null }} [assets]
+ *        logo image to print in the header (PNG/JPEG bytes or data URL, with its
+ *        pixel size), or null for none
  * @returns {{ doc: import("jspdf").jsPDF, pageCount: number, oversizedItemIds: string[] }}
  */
-export function buildAriyippuPdf(notice, fontBytes) {
+export function buildAriyippuPdf(notice, fontBytes, { logo = null } = {}) {
   const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "portrait" });
   registerFonts(doc, fontBytes);
 
@@ -64,7 +67,7 @@ export function buildAriyippuPdf(notice, fontBytes) {
     return doc.getTextWidth(text);
   };
 
-  const blocks = buildBlocks(doc, notice, measure);
+  const blocks = buildBlocks(doc, notice, logo, measure);
   const { placements, pageCount, oversized } = paginate(blocks, {
     top: MARGIN.top,
     bottom: PAGE.height - MARGIN.bottom,
@@ -82,8 +85,8 @@ export function buildAriyippuPdf(notice, fontBytes) {
 
 // ── Blocks ──────────────────────────────────────────────────────────────────
 
-function buildBlocks(doc, notice, measure) {
-  const blocks = [headerBlock(doc, notice.header)];
+function buildBlocks(doc, notice, logo, measure) {
+  const blocks = [headerBlock(doc, notice.header, logo)];
 
   blocks.push(
     paragraphBlock(doc, {
@@ -182,9 +185,9 @@ function paragraphBlock(doc, { runs, x, width, align, sizes, lineHeight, spaceBe
   };
 }
 
-function headerBlock(doc, header) {
-  const LOGO = { x: MARGIN.left - 20, y: MARGIN.top - 6, size: 96 };
-  const hasLogo = Boolean(header.logoDataUrl);
+function headerBlock(doc, header, logo) {
+  const LOGO = { x: MARGIN.left - 22, y: MARGIN.top - 8, size: 104 };
+  const hasLogo = Boolean(logo);
   // Header text is centred in the space to the right of the logo.
   const textLeft = hasLogo ? LOGO.x + LOGO.size + 10 : MARGIN.left;
   const centerX = (textLeft + CONTENT_RIGHT) / 2;
@@ -195,7 +198,7 @@ function headerBlock(doc, header) {
     spaceBefore: 0,
     keepWithNext: true,
     draw(y) {
-      if (hasLogo) drawLogo(doc, header.logoDataUrl, LOGO.x, y + LOGO.y - MARGIN.top, LOGO.size);
+      if (hasLogo) drawLogo(doc, logo, LOGO.x, y + LOGO.y - MARGIN.top, LOGO.size);
 
       const rows = [
         { text: header.churchName, style: "bold", size: 15.5, color: HEADER_COLOR.name, dy: 30 },
@@ -275,22 +278,15 @@ function drawLine(doc, line, x, baseline) {
   }
 }
 
-function drawLogo(doc, dataUrl, x, y, size) {
-  const r = size / 2;
-  const cx = x + r;
-  const cy = y + r;
-  const format = /^data:image\/(png|jpe?g|webp)/i.exec(dataUrl)?.[1]?.toUpperCase().replace("JPG", "JPEG") ?? "PNG";
-
-  doc.saveGraphicsState();
-  doc.circle(cx, cy, r - 3, null);
-  doc.clip();
-  doc.discardPath();
-  doc.addImage(dataUrl, format, x, y, size, size);
-  doc.restoreGraphicsState();
-
-  // Purple ring like the printed notice.
-  doc.setDrawColor(96, 60, 150);
-  doc.setLineWidth(4);
-  doc.circle(cx, cy, r - 3, "S");
-  doc.setDrawColor(0, 0, 0);
+/**
+ * Draws the logo whole (no cropping), scaled to fit a size × size box and
+ * centred in it. Transparent areas stay transparent.
+ */
+function drawLogo(doc, logo, x, y, size) {
+  const scale = size / Math.max(logo.width, logo.height);
+  const w = logo.width * scale;
+  const h = logo.height * scale;
+  const format =
+    typeof logo.data === "string" && /^data:image\/jpe?g/i.test(logo.data) ? "JPEG" : "PNG";
+  doc.addImage(logo.data, format, x + (size - w) / 2, y + (size - h) / 2, w, h, undefined, "SLOW");
 }
