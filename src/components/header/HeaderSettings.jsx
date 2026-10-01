@@ -33,7 +33,7 @@ function fileToLogoDataUrl(file) {
 function MalayalamField({ label, value, onChange }) {
   return (
     <div className="field-with-action">
-      <TextField label={label} value={value} onChange={onChange} className="ml-text" />
+      <TextField label={label} value={value} onChange={onChange} className="ml-text" inputModes />
       <Button size="sm" variant="ghost" title="Convert Manglish to Malayalam" onClick={() => onChange(manglishToMalayalam(value))}>
         a→അ
       </Button>
@@ -113,10 +113,10 @@ export function HeaderSettings() {
             {logoError && <p className="hint hint-error">{logoError}</p>}
           </div>
           <div className="details-fields">
-            <TextField label="Church name" value={header.churchName} onChange={(churchName) => setHeader({ churchName })} />
-            <TextField label="Subtitle" value={header.subtitle} onChange={(subtitle) => setHeader({ subtitle })} />
-            <TextField label="Address line 1" value={header.addressLine1} onChange={(addressLine1) => setHeader({ addressLine1 })} />
-            <TextField label="Address line 2" value={header.addressLine2} onChange={(addressLine2) => setHeader({ addressLine2 })} />
+            <TextField label="Church name" value={header.churchName} onChange={(churchName) => setHeader({ churchName })} inputModes />
+            <TextField label="Subtitle" value={header.subtitle} onChange={(subtitle) => setHeader({ subtitle })} inputModes />
+            <TextField label="Address line 1" value={header.addressLine1} onChange={(addressLine1) => setHeader({ addressLine1 })} inputModes />
+            <TextField label="Address line 2" value={header.addressLine2} onChange={(addressLine2) => setHeader({ addressLine2 })} inputModes />
             <MalayalamField label="Signature name" value={signature.name} onChange={(name) => setSignature({ name })} />
             <MalayalamField label="Signature title" value={signature.title} onChange={(title) => setSignature({ title })} />
           </div>
