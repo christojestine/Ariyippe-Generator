@@ -10,6 +10,11 @@ import { persist } from "zustand/middleware";
 import { emptyNotice, makeSection, newId, sampleNotice } from "../data/notice.js";
 
 export const INPUT_MODES = ["manglish", "english", "inscript"];
+export const THEMES = ["dark", "light"];
+
+/** First visit follows the OS colour scheme; after that the toggle decides. */
+const systemTheme = () =>
+  typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
 
 const updateSection = (notice, sectionId, fn) => ({
   ...notice,
@@ -21,10 +26,12 @@ export const useAriyippuStore = create(
     (set) => ({
       notice: emptyNotice(),
       inputMode: "manglish",
+      theme: systemTheme(),
       /** Item ids that were too tall for one page in the last generated PDF. */
       oversizedItemIds: [],
 
       setInputMode: (inputMode) => set({ inputMode }),
+      setTheme: (theme) => set({ theme }),
       cycleInputMode: () =>
         set((s) => ({ inputMode: INPUT_MODES[(INPUT_MODES.indexOf(s.inputMode) + 1) % INPUT_MODES.length] })),
 
@@ -91,7 +98,7 @@ export const useAriyippuStore = create(
     }),
     {
       name: "ariyippu-notice-v1",
-      partialize: (s) => ({ notice: s.notice, inputMode: s.inputMode }),
+      partialize: (s) => ({ notice: s.notice, inputMode: s.inputMode, theme: s.theme }),
     },
   ),
 );

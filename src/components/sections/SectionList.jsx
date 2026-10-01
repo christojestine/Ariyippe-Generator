@@ -1,5 +1,4 @@
 import { useAriyippuStore } from "../../store/useAriyippuStore.js";
-import { Button } from "../common/Button.jsx";
 import { SectionPanel } from "./SectionPanel.jsx";
 import { Icon } from "../common/Icon.jsx";
 
@@ -13,9 +12,10 @@ export function SectionList() {
       {sections.map((section, i) => (
         <SectionPanel key={section.id} section={section} index={i} count={sections.length} />
       ))}
-      <Button variant="secondary" className="add-section" onClick={() => addSection("numbered")}>
-        <Icon name="plus" /> Add section
-      </Button>
+      <button type="button" className="add-section" onClick={() => addSection("numbered")}>
+        <Icon name="plusCircle" /> Add section
+        <span className="add-section-hint">e.g. obituary, youth movement, pious union</span>
+      </button>
     </div>
   );
 }

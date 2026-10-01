@@ -18,7 +18,7 @@ export function ItemStack({ section }) {
         <ItemCard
           key={item.id}
           item={item}
-          marker={section.kind === "numbered" ? `${i + 1}.` : section.kind === "bulleted" ? "•" : "–"}
+          marker={section.kind === "numbered" ? `${i + 1}` : section.kind === "bulleted" ? "•" : "–"}
           isFirst={i === 0}
           isLast={i === section.items.length - 1}
           oversized={oversizedItemIds.includes(item.id)}

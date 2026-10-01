@@ -26,9 +26,15 @@ export function ItemComposer({ onAdd, placeholder }) {
       <RichTextEditor ref={editorRef} placeholder={placeholder} onSubmit={add} />
       <div className="composer-actions">
         <span className={error ? "hint hint-error" : "hint"}>
-          {error ? "Type something first." : "Ctrl+Enter to add"}
+          {error ? (
+            "Type something first."
+          ) : (
+            <>
+              <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to add
+            </>
+          )}
         </span>
-        <Button variant="primary" onClick={add}>
+        <Button variant="accent" size="sm" onClick={add}>
           <Icon name="plus" /> Add item
         </Button>
       </div>

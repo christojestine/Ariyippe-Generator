@@ -1,7 +1,7 @@
 /**
  * A row of mutually exclusive options (radio group styled as segments).
  *
- * options: Array<{ value: string, label: string, hint?: string }>
+ * options: Array<{ value: string, label: React.ReactNode, hint?: string }>
  */
 export function SegmentedToggle({ label, value, options, onChange, size = "md" }) {
   return (

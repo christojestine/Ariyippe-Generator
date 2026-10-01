@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
+import { downloadUrl, generateNoticePdf, pdfFileName } from "../../lib/pdf/generateNoticePdf.js";
 import { isRichDocEmpty, richDocToText } from "../../lib/text/richDoc.js";
 import { useAriyippuStore } from "../../store/useAriyippuStore.js";
 import { Button } from "../common/Button.jsx";
 import { Modal } from "../common/Modal.jsx";
 import { Icon } from "../common/Icon.jsx";
-
-/** "dd.mm.yyyy" → "yyyy-mm-dd" for the file name; otherwise a safe slug. */
-function fileNameFor(noticeDate) {
-  const m = /^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/.exec(noticeDate.trim());
-  const stamp = m ? `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}` : noticeDate.replace(/[^\w-]+/g, "-");
-  return `ariyippu-${stamp || "notice"}.pdf`;
-}
 
 /**
  * Generate button + modal: review the items, confirm, preview the PDF,
@@ -44,15 +38,9 @@ export function GeneratePanel() {
     setStatus("building");
     setError("");
     try {
-      const [{ buildAriyippuPdf }, { loadFontBytes }, { resolveLogo }] = await Promise.all([
-        import("../../lib/pdf/buildAriyippuPdf.js"),
-        import("../../lib/pdf/loadFonts.js"),
-        import("../../lib/pdf/loadLogo.js"),
-      ]);
-      const [fontBytes, logo] = await Promise.all([loadFontBytes(), resolveLogo(notice.header)]);
-      const { doc, pageCount, oversizedItemIds } = buildAriyippuPdf(notice, fontBytes, { logo });
+      const { blob, pageCount, oversizedItemIds } = await generateNoticePdf(notice);
       setOversizedItemIds(oversizedItemIds);
-      setPdf({ url: URL.createObjectURL(doc.output("blob")), pageCount, oversized: oversizedItemIds.length });
+      setPdf({ url: URL.createObjectURL(blob), pageCount, oversized: oversizedItemIds.length });
       setStatus("ready");
     } catch (err) {
       console.error(err);
@@ -61,14 +49,7 @@ export function GeneratePanel() {
     }
   };
 
-  const download = () => {
-    const a = document.createElement("a");
-    a.href = pdf.url;
-    a.download = fileNameFor(notice.noticeDate);
-    document.body.append(a);
-    a.click();
-    a.remove();
-  };
+  const download = () => downloadUrl(pdf.url, pdfFileName(notice.noticeDate));
 
   const footer =
     status === "ready" ? (
@@ -96,8 +77,8 @@ export function GeneratePanel() {
 
   return (
     <>
-      <Button variant="primary" onClick={openPanel}>
-        Generate PDF
+      <Button variant="primary" className="btn-export" onClick={openPanel}>
+        <Icon name="printer" /> Export PDF
       </Button>
       <Modal open={open} title={status === "ready" ? "Your Ariyippu" : "Confirm items"} onClose={() => setOpen(false)} footer={footer} wide={status === "ready"}>
         {status === "ready" && pdf ? (

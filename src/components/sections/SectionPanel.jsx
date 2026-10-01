@@ -10,6 +10,9 @@ import { ItemComposer } from "../items/ItemComposer.jsx";
 import { ItemStack } from "../items/ItemStack.jsx";
 import { Icon } from "../common/Icon.jsx";
 
+/** Accent colour per section, cycling (matches .section-panel in app.css). */
+const ACCENTS = ["cyan", "violet", "emerald", "amber"];
+
 const KIND_OPTIONS = Object.entries(SECTION_KIND_LABELS).map(([value, label]) => ({ value, label }));
 
 /** One section of the notice: optional heading, list style, and its items. */
@@ -35,7 +38,7 @@ export function SectionPanel({ section, index, count }) {
   };
 
   return (
-    <section className="card section-panel" aria-label={`Section ${index + 1}`}>
+    <section className={`card section-panel accent-${ACCENTS[index % ACCENTS.length]}`} aria-label={`Section ${index + 1}`}>
       <header className="section-header">
         <div className="section-heading">
           {editingHeading ? (
@@ -67,6 +70,9 @@ export function SectionPanel({ section, index, count }) {
                   {index === 0 ? "Announcements" : `Section ${index + 1}`} · no heading
                 </span>
               )}
+              <span className="tag tag-accent">
+                {section.items.length} item{section.items.length === 1 ? "" : "s"}
+              </span>
               <span className="heading-edit-hint">
                 <Icon name="edit" /> Edit heading
               </span>
@@ -81,15 +87,17 @@ export function SectionPanel({ section, index, count }) {
             options={KIND_OPTIONS}
             onChange={(kind) => updateSection(section.id, { kind })}
           />
-          <IconButton label="Move section up" disabled={index === 0} onClick={() => moveSection(section.id, -1)}>
-            <Icon name="up" />
-          </IconButton>
-          <IconButton label="Move section down" disabled={index === count - 1} onClick={() => moveSection(section.id, 1)}>
-            <Icon name="down" />
-          </IconButton>
-          <IconButton label="Delete section" variant="danger" onClick={remove}>
-            <Icon name="trash" />
-          </IconButton>
+          <div className="tool-group">
+            <IconButton label="Move section up" disabled={index === 0} onClick={() => moveSection(section.id, -1)}>
+              <Icon name="up" />
+            </IconButton>
+            <IconButton label="Move section down" disabled={index === count - 1} onClick={() => moveSection(section.id, 1)}>
+              <Icon name="down" />
+            </IconButton>
+            <IconButton label="Delete section" variant="danger" onClick={remove}>
+              <Icon name="trash" />
+            </IconButton>
+          </div>
         </div>
       </header>
 

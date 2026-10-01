@@ -4,6 +4,7 @@ import { manglishToMalayalam } from "../../lib/translit/manglish.js";
 import { useAriyippuStore } from "../../store/useAriyippuStore.js";
 import { Button } from "../common/Button.jsx";
 import { Card } from "../common/Card.jsx";
+import { Icon } from "../common/Icon.jsx";
 import { TextField } from "../common/TextField.jsx";
 
 const LOGO_MAX = 500; // px — plenty for a ~1.4in printed logo, small enough for localStorage
@@ -69,10 +70,11 @@ export function HeaderSettings() {
   return (
     <Card
       title="Notice details"
+      className="params-card"
       subtitle={`${header.title} ${notice.noticeDate} · ${header.churchName}`}
       actions={
         <Button variant="ghost" size="sm" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-          {open ? "Hide" : "Edit header, logo & signature"}
+          <Icon name="brush" className="icon-accent" /> {open ? "Hide header settings" : "Edit header, logo & signature"}
         </Button>
       }
     >
