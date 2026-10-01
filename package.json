@@ -1,0 +1,34 @@
+{
+  "name": "ariyippu-generator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Compose the weekly parish notice (Ariyippu) in English, Malayalam or Manglish and export a print-ready PDF.",
+  "type": "module",
+  "packageManager": "pnpm@11.21.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "rspack serve",
+    "build": "rspack build",
+    "preview": "npx --yes serve dist",
+    "test": "node --test \"src/**/*.test.js\""
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@tiptap/core": "^3.31.3",
+    "@tiptap/extensions": "^3.31.3",
+    "@tiptap/pm": "^3.31.3",
+    "@tiptap/react": "^3.31.3",
+    "@tiptap/starter-kit": "^3.31.3",
+    "jspdf": "^4.2.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@rspack/cli": "^2.2.8",
+    "@rspack/core": "^2.2.8",
+    "@rspack/dev-server": "^2.2.1"
+  }
+}
