@@ -11,6 +11,8 @@ import { emptyNotice, makeSection, newId, sampleNotice } from "../data/notice.js
 
 export const INPUT_MODES = ["manglish", "english", "inscript"];
 export const THEMES = ["dark", "light"];
+/** localStorage key of the saved notice (index.html reads it too). */
+export const STORAGE_KEY = "ariyippu-notice-v1";
 
 /** First visit follows the OS colour scheme; after that the toggle decides. */
 const systemTheme = () =>
@@ -97,7 +99,7 @@ export const useAriyippuStore = create(
         })),
     }),
     {
-      name: "ariyippu-notice-v1",
+      name: STORAGE_KEY,
       partialize: (s) => ({ notice: s.notice, inputMode: s.inputMode, theme: s.theme }),
     },
   ),

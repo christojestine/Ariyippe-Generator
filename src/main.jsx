@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App.jsx";
+import { ErrorBoundary } from "./components/common/ErrorBoundary.jsx";
 import { useAriyippuStore } from "./store/useAriyippuStore.js";
 import "./styles/app.css";
 
@@ -11,6 +12,8 @@ useAriyippuStore.subscribe((s) => applyTheme(s.theme));
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary variant="page">
+      <App />
+    </ErrorBoundary>
   </StrictMode>,
 );

@@ -1764,6 +1764,170 @@ select.field-input option {
   font-size: 14px;
 }
 
+/* ── Error boundary ──────────────────────────────────────────────────────── */
+/* Full-page fallback: one glass card centred on the grid background. */
+.error-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+}
+
+.error-card {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  padding: 32px;
+  overflow: hidden;
+  background: var(--modal-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  box-shadow: var(--modal-shadow);
+}
+
+/* Danger-tinted corner glow, the error twin of .params-card. */
+.error-card::before {
+  content: "";
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: var(--danger-soft);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.error-mark {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 20px;
+  border: 1px solid var(--danger);
+  border-radius: 14px;
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.error-mark .icon {
+  width: 24px;
+  height: 24px;
+}
+
+.error-eyebrow {
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--danger);
+}
+
+.error-title {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--text-strong);
+}
+
+.error-text {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.error-recovery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--divider);
+}
+
+.btn-ghost-danger:hover:not(:disabled) {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.error-details {
+  margin-top: 18px;
+  font-size: 12px;
+}
+
+.error-details summary {
+  width: fit-content;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  color: var(--text-faint);
+}
+
+.error-details summary:hover {
+  color: var(--accent-text);
+}
+
+.error-details pre {
+  max-height: 220px;
+  margin: 10px 0 0;
+  padding: 12px 14px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--control-bg);
+  color: var(--text-soft);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Panel fallback: a regular card with a danger rule on the left. */
+.error-panel {
+  border-left: 3px solid var(--danger);
+}
+
+.error-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 14px;
+}
+
+.error-panel-head > div {
+  flex: 1;
+  min-width: 200px;
+}
+
+.error-panel-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.error-panel-text {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
 /* ── Smaller screens ─────────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
   .workspace {
@@ -1795,7 +1959,8 @@ select.field-input option {
     padding: 16px 16px 40px;
   }
 
-  .card {
+  .card,
+  .error-card {
     padding: 16px;
   }
 

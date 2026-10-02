@@ -1,5 +1,6 @@
 import { useAriyippuStore } from "./store/useAriyippuStore.js";
 import { Button } from "./components/common/Button.jsx";
+import { ErrorBoundary } from "./components/common/ErrorBoundary.jsx";
 import { Icon } from "./components/common/Icon.jsx";
 import { ThemeToggle } from "./components/common/ThemeToggle.jsx";
 import { InputModeToggle } from "./components/editor/InputModeToggle.jsx";
@@ -53,10 +54,16 @@ export function App() {
 
       <main className="workspace">
         <div className="builder">
-          <HeaderSettings />
-          <SectionList />
+          <ErrorBoundary variant="panel" name="Notice details">
+            <HeaderSettings />
+          </ErrorBoundary>
+          <ErrorBoundary variant="panel" name="Sections">
+            <SectionList />
+          </ErrorBoundary>
         </div>
-        <PreviewPanel />
+        <ErrorBoundary variant="panel" name="Print preview">
+          <PreviewPanel />
+        </ErrorBoundary>
       </main>
 
       <footer className="statusbar glass">
