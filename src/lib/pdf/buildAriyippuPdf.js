@@ -17,7 +17,7 @@ import { ML_FONT, LATIN_FONT, registerFonts, latinStyle } from "./fonts.js";
 
 // ── Page geometry (pt, A4 portrait) ─────────────────────────────────────────
 const PAGE = { width: 595.28, height: 841.89 };
-const MARGIN = { top: 36, bottom: 42, left: 50, right: 40 };
+const MARGIN = { top: 18, bottom: 9, left: 40, right: 40 };
 const CONTENT_RIGHT = PAGE.width - MARGIN.right;
 
 // ── Typography ──────────────────────────────────────────────────────────────
@@ -30,6 +30,7 @@ const TITLE_LINE = 26;
 const HEADER_COLOR = { name: [31, 56, 100], sub: [38, 70, 125], text: [61, 80, 115] };
 const ITALIC_SHEAR = Math.tan((12 * Math.PI) / 180);
 const FAUX_BOLD_EM = 0.03; // stroke width relative to font size
+const REGULAR_WEIGHT_EM = 0.0072; // light stroke that thickens regular text a little
 const UNDERLINE = { offset: 2, width: 0.6 };
 
 // ── Lists ───────────────────────────────────────────────────────────────────
@@ -186,11 +187,10 @@ function paragraphBlock(doc, { runs, x, width, align, sizes, lineHeight, spaceBe
 }
 
 function headerBlock(doc, header, logo) {
-  const LOGO = { x: MARGIN.left - 22, y: MARGIN.top - 8, size: 104 };
+  const LOGO = { minX: MARGIN.left - 22, y: MARGIN.top - 8, size: 104, gap: 24 };
   const hasLogo = Boolean(logo);
-  // Header text is centred in the space to the right of the logo.
-  const textLeft = hasLogo ? LOGO.x + LOGO.size + 10 : MARGIN.left;
-  const centerX = (textLeft + CONTENT_RIGHT) / 2;
+  // Logo and text are centred on the page together as one group.
+  const pageCenter = (MARGIN.left + CONTENT_RIGHT) / 2;
   const height = 108;
 
   return {
@@ -198,14 +198,27 @@ function headerBlock(doc, header, logo) {
     spaceBefore: 0,
     keepWithNext: true,
     draw(y) {
-      if (hasLogo) drawLogo(doc, logo, LOGO.x, y + LOGO.y - MARGIN.top, LOGO.size);
-
+      // First dy places the text block's vertical middle on the logo's middle.
       const rows = [
-        { text: header.churchName, style: "bold", size: 15.5, color: HEADER_COLOR.name, dy: 30 },
+        { text: header.churchName, style: "bold", size: 15.5, color: HEADER_COLOR.name, dy: 18 },
         { text: header.subtitle, style: "bold", size: 14, color: HEADER_COLOR.sub, dy: 21 },
         { text: header.addressLine1, style: "normal", size: 12.5, color: HEADER_COLOR.text, dy: 20 },
         { text: header.addressLine2, style: "normal", size: 12.5, color: HEADER_COLOR.text, dy: 19 },
       ];
+      let widest = 0;
+      for (const row of rows) {
+        if (!row.text) continue;
+        doc.setFont(LATIN_FONT, row.style);
+        doc.setFontSize(row.size);
+        widest = Math.max(widest, doc.getTextWidth(row.text));
+      }
+      let centerX = pageCenter;
+      if (hasLogo) {
+        const groupWidth = LOGO.size + LOGO.gap + widest;
+        const logoX = Math.max(LOGO.minX, pageCenter - groupWidth / 2);
+        drawLogo(doc, logo, logoX, y + LOGO.y - MARGIN.top, LOGO.size);
+        centerX = logoX + LOGO.size + LOGO.gap + widest / 2;
+      }
       let baseline = y;
       for (const row of rows) {
         baseline += row.dy;
@@ -257,12 +270,14 @@ function drawLine(doc, line, x, baseline) {
   for (const frag of line.fragments) {
     setFont(doc, frag.script, frag.bold, frag.italic, frag.size);
     const opts = { baseline: "alphabetic" };
+    // The Malayalam font has no bold face, so bold is simulated with a heavy
+    // stroke; other regular text gets a light stroke for a slightly darker body.
+    const stroke = frag.bold ? (frag.script === "ml" ? FAUX_BOLD_EM : 0) : REGULAR_WEIGHT_EM;
+    if (stroke) {
+      doc.setLineWidth(frag.size * stroke);
+      opts.renderingMode = "fillThenStroke";
+    }
     if (frag.script === "ml") {
-      // The Malayalam font has no bold/italic faces: simulate them.
-      if (frag.bold) {
-        doc.setLineWidth(frag.size * FAUX_BOLD_EM);
-        opts.renderingMode = "fillThenStroke";
-      }
       if (frag.italic) opts.angle = new doc.Matrix(1, 0, ITALIC_SHEAR, 1, 0, 0);
     }
     // jsPDF applies the shear to the text position too (in PDF space, where y

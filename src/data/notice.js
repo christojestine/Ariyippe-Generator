@@ -27,6 +27,7 @@ export const DEFAULT_SIGNATURE = { name: "വർഗീസ് പാത്താ�
 const SECTION_TEMPLATES = [
   { kind: "numbered", heading: "" },
   { kind: "bulleted", heading: "ഈയാഴ്ചയിലെ വിശേഷ ദിവസങ്ങൾ ......" },
+  { kind: "line", heading: "സ്തോത്രക്കാഴ്ച" },
   { kind: "numbered", heading: "കഴിഞ്ഞയാഴ്ചയിൽ ലഭിച്ച സമർപ്പണങ്ങൾ -" },
   { kind: "numbered", heading: "കഴിഞ്ഞയാഴ്ചയിൽ നൽകിയ സഹായങ്ങൾ -" },
 ];
@@ -119,7 +120,7 @@ export function sampleNotice() {
     sections: [
       makeSection("numbered", "", SAMPLE_ANNOUNCEMENTS),
       makeSection("bulleted", "ഈയാഴ്ചയിലെ വിശേഷ ദിവസങ്ങൾ ......", SAMPLE_SPECIAL_DAYS),
-      makeSection("line", "", ["കഴിഞ്ഞ ആഴ്ചയിലെ സ്തോത്രക്കാഴ്ച 63,130/-"]),
+      makeSection("line", "സ്തോത്രക്കാഴ്ച", ["കഴിഞ്ഞ ആഴ്ചയിലെ സ്തോത്രക്കാഴ്ച 63,130/-"]),
       makeSection("numbered", "കഴിഞ്ഞയാഴ്ചയിൽ ലഭിച്ച സമർപ്പണങ്ങൾ -", SAMPLE_OFFERINGS),
       makeSection("numbered", "കഴിഞ്ഞയാഴ്ചയിൽ നൽകിയ സഹായങ്ങൾ -", SAMPLE_HELP),
     ],

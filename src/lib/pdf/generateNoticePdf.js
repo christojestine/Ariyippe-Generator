@@ -21,11 +21,13 @@ export async function generateNoticePdf(notice) {
   return { blob: doc.output("blob"), pageCount, oversizedItemIds };
 }
 
-/** "dd.mm.yyyy" → "ariyippu-yyyy-mm-dd.pdf"; otherwise a safe slug. */
+/** "dd.mm.yyyy" → "Ariyippe - dd.mm.yyyy - St.Mary's Forane Church Chalakudy.pdf". */
 export function pdfFileName(noticeDate) {
   const m = /^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/.exec(noticeDate.trim());
-  const stamp = m ? `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}` : noticeDate.replace(/[^\w-]+/g, "-");
-  return `ariyippu-${stamp || "notice"}.pdf`;
+  const date = m
+    ? `${m[1].padStart(2, "0")}.${m[2].padStart(2, "0")}.${m[3]}`
+    : noticeDate.trim().replace(/[\\/:*?"<>|]+/g, "-");
+  return `Ariyippe - ${date || "Notice"} - St.Mary's Forane Church Chalakudy.pdf`;
 }
 
 /** Saves a blob URL under the given file name. */
