@@ -11,19 +11,66 @@
  *    the block after it.
  *  - Only a block taller than a whole page is split, at line boundaries; it
  *    is reported in `oversized` so the UI can warn about it.
+ *  - Blocks sharing a `group` (a section: heading + items) that break across
+ *    a page with only `minGroupTail - 1` or fewer blocks on the next page
+ *    move to the next page together, if the group fits on one page.
  */
 
 /**
- * @typedef {{ lines: number[], spaceBefore?: number, keepWithNext?: boolean }} Block
+ * @typedef {{ lines: number[], spaceBefore?: number, keepWithNext?: boolean, group?: string }} Block
  * @typedef {{ block: number, page: number, y: number, fromLine: number, toLine: number }} Placement
  */
 
 /**
  * @param {Block[]} blocks
  * @param {{ top: number, bottom: number }} area   usable y range on every page
+ * @param {{ minGroupTail?: number }} [options]
+ *        fewest blocks of a group allowed on the page after a break (0 = off)
  * @returns {{ placements: Placement[], pageCount: number, oversized: number[] }}
  */
-export function paginate(blocks, { top, bottom }) {
+export function paginate(blocks, area, { minGroupTail = 0 } = {}) {
+  const breakBefore = new Set();
+  // Each pass may push one more group to a new page; groups only ever move
+  // forward, so this ends after at most one pass per group.
+  for (;;) {
+    const result = place(blocks, area, breakBefore);
+    const start = minGroupTail > 0 && groupToMove(blocks, area, result.placements, breakBefore, minGroupTail);
+    if (start === false) return result;
+    breakBefore.add(start);
+  }
+}
+
+/** First block of a group that breaks with too short a tail, if any. */
+function groupToMove(blocks, { top, bottom }, placements, breakBefore, minGroupTail) {
+  const pageOf = new Map();
+  const yOf = new Map();
+  for (const p of placements) {
+    if (!pageOf.has(p.block)) {
+      pageOf.set(p.block, p.page);
+      yOf.set(p.block, p.y);
+    }
+  }
+
+  for (let start = 0; start < blocks.length; start++) {
+    const group = blocks[start].group;
+    if (group == null || blocks[start - 1]?.group === group) continue;
+    let end = start;
+    while (blocks[end + 1]?.group === group) end++;
+
+    if (breakBefore.has(start) || yOf.get(start) === top) continue;
+    const firstPage = pageOf.get(start);
+    let tail = 0;
+    let height = 0;
+    for (let i = start; i <= end; i++) {
+      if (pageOf.get(i) > firstPage) tail++;
+      height += (i > start ? blocks[i].spaceBefore ?? 0 : 0) + blocks[i].lines.reduce((sum, h) => sum + h, 0);
+    }
+    if (tail > 0 && tail < minGroupTail && height <= bottom - top) return start;
+  }
+  return false;
+}
+
+function place(blocks, { top, bottom }, breakBefore) {
   const usable = bottom - top;
   const heightOf = (b) => b.lines.reduce((sum, h) => sum + h, 0);
 
@@ -39,6 +86,7 @@ export function paginate(blocks, { top, bottom }) {
 
   blocks.forEach((block, index) => {
     const height = heightOf(block);
+    if (breakBefore.has(index) && y > top) newPage();
     let spaceBefore = y === top ? 0 : block.spaceBefore ?? 0;
 
     // Height that must fit together: this block plus, for keepWithNext,

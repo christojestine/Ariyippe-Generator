@@ -39,7 +39,7 @@ export function App() {
         </div>
         <div className="topbar-actions">
           <ThemeToggle />
-          <Button variant="secondary" onClick={confirmThen("Replace the current notice with the 27.09.2026 sample?", loadSample)}>
+          <Button variant="secondary" onClick={confirmThen("Replace the current notice with the 10.10.2026 sample?", loadSample)}>
             <Icon name="fileDown" /> Load sample
           </Button>
           <Button

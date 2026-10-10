@@ -31,7 +31,7 @@ Every font (UI and PDF) lives in `src/assets/fonts/` and is loaded through `@fon
 ## Architecture
 
 ### State
-`src/store/useAriyippuStore.js` is a single Zustand store and the only source of truth. It is persisted to localStorage under the key `ariyippu-notice-v1`, and only `notice`, `inputMode` and `theme` are persisted. If you change the shape of `notice`, persisted data from older versions will still be loaded, so either stay backward compatible or bump the key. `src/data/notice.js` defines the notice shape, the default header and signature, the default section templates and the 27.09.2026 sample notice.
+`src/store/useAriyippuStore.js` is a single Zustand store and the only source of truth. It is persisted to localStorage under the key `ariyippu-notice-v1`, and only `notice`, `inputMode` and `theme` are persisted. If you change the shape of `notice`, persisted data from older versions will still be loaded, so either stay backward compatible or bump the key. `src/data/notice.js` defines the notice shape, the default header and signature, the default section templates and the 10.10.2026 sample notice.
 
 Notice shape: `{ header, noticeDate: "dd.mm.yyyy", sections: [{ id, kind: "numbered"|"bulleted"|"line", heading: RichDoc|null, items: [{ id, content: RichDoc }] }], signature }`. A RichDoc is TipTap/ProseMirror JSON. `src/lib/text/richDoc.js` converts it to and from flat formatted "runs" (`{ text, bold, italic, underline }`).
 

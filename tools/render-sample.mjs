@@ -1,7 +1,7 @@
 /**
  * render-sample.mjs
  *
- * Dev helper: renders the built-in sample notice (27.09.2026) to a PDF with
+ * Dev helper: renders the built-in sample notice (10.10.2026) to a PDF with
  * the same builder the app uses, to check the layout without a browser.
  *
  * Usage: node tools/render-sample.mjs [out.pdf] [logo.png]   (default: the bundled logo)

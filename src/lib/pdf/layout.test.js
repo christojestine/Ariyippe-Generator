@@ -87,4 +87,23 @@ describe("paginate", () => {
     const { placements } = paginate([block(9), block(2)], area);
     assert.equal(placements[1].y, 0);
   });
+
+  it("moves a whole section when too few of its items spill to the next page", () => {
+    const section = [block(1, { group: "s", keepWithNext: true }), ...Array.from({ length: 4 }, () => block(1, { group: "s" }))];
+    const { placements } = paginate([block(5), ...section], area, { minGroupTail: 4 });
+    assert.deepEqual(placements.map((p) => p.page), [0, 1, 1, 1, 1, 1]);
+    assert.equal(placements[1].y, 0);
+  });
+
+  it("splits a section normally when enough items go to the next page", () => {
+    const section = Array.from({ length: 8 }, () => block(1, { group: "s" }));
+    const { placements } = paginate([block(5), ...section], area, { minGroupTail: 4 });
+    assert.deepEqual(placements.map((p) => p.page), [0, 0, 0, 0, 1, 1, 1, 1, 1]);
+  });
+
+  it("does not move a section taller than a page", () => {
+    const section = Array.from({ length: 9 }, () => block(1, { group: "s" }));
+    const { placements } = paginate([block(2), ...section], area, { minGroupTail: 4 });
+    assert.equal(placements[1].page, 0);
+  });
 });

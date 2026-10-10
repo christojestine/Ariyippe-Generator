@@ -42,6 +42,9 @@ const LIST = {
 const BULLET_RADIUS = 2.6;
 const ITEM_GAP = 1.5;
 const SECTION_GAP = 14;
+// A section that breaks with fewer items than this on the next page moves
+// to the next page whole.
+const MIN_SECTION_TAIL = 4;
 
 /**
  * @typedef {object} Notice
@@ -69,10 +72,11 @@ export function buildAriyippuPdf(notice, fontBytes, { logo = null } = {}) {
   };
 
   const blocks = buildBlocks(doc, notice, logo, measure);
-  const { placements, pageCount, oversized } = paginate(blocks, {
-    top: MARGIN.top,
-    bottom: PAGE.height - MARGIN.bottom,
-  });
+  const { placements, pageCount, oversized } = paginate(
+    blocks,
+    { top: MARGIN.top, bottom: PAGE.height - MARGIN.bottom },
+    { minGroupTail: MIN_SECTION_TAIL },
+  );
 
   for (let p = 1; p < pageCount; p++) doc.addPage("a4", "portrait");
   for (const placement of placements) {
@@ -111,19 +115,19 @@ function buildBlocks(doc, notice, logo, measure) {
     if (!items.length) continue; // empty sections are skipped, heading included
 
     if (hasHeading) {
-      blocks.push(
-        paragraphBlock(doc, {
-          runs: richDocToRuns(section.heading),
-          x: MARGIN.left,
-          width: CONTENT_RIGHT - MARGIN.left,
-          align: "left",
-          sizes: BODY,
-          lineHeight: BODY_LINE,
-          spaceBefore: firstContent ? 14 : SECTION_GAP,
-          keepWithNext: true,
-          measure,
-        }),
-      );
+      const heading = paragraphBlock(doc, {
+        runs: richDocToRuns(section.heading),
+        x: MARGIN.left,
+        width: CONTENT_RIGHT - MARGIN.left,
+        align: "left",
+        sizes: BODY,
+        lineHeight: BODY_LINE,
+        spaceBefore: firstContent ? 14 : SECTION_GAP,
+        keepWithNext: true,
+        measure,
+      });
+      heading.group = section.id;
+      blocks.push(heading);
     }
 
     const list = LIST[section.kind] ?? LIST.numbered;
@@ -146,6 +150,7 @@ function buildBlocks(doc, notice, logo, measure) {
         measure,
       });
       block.itemId = item.id;
+      block.group = section.id;
       blocks.push(block);
     });
 
