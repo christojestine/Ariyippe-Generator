@@ -9,7 +9,19 @@ import { Icon } from "../common/Icon.jsx";
  * One item in a section's stack: marker (number / bullet), content, and
  * move / edit / delete actions. Edits happen inline.
  */
-export function ItemCard({ marker, item, isFirst, isLast, oversized, onSave, onRemove, onMove }) {
+export function ItemCard({
+  marker,
+  item,
+  isFirst,
+  isLast,
+  oversized,
+  dragging,
+  offset,
+  onPressStart,
+  onSave,
+  onRemove,
+  onMove,
+}) {
   const [editing, setEditing] = useState(false);
   const editorRef = useRef(null);
 
@@ -21,7 +33,11 @@ export function ItemCard({ marker, item, isFirst, isLast, oversized, onSave, onR
   };
 
   return (
-    <li className={`item-card ${editing ? "is-editing" : ""} ${oversized ? "is-oversized" : ""}`}>
+    <li
+      className={`item-card ${editing ? "is-editing" : "is-draggable"} ${oversized ? "is-oversized" : ""} ${dragging ? "is-dragging" : ""}`}
+      style={offset ? { transform: `translateY(${offset}px)` } : undefined}
+      onPointerDown={editing ? undefined : onPressStart}
+    >
       <span className="item-marker" aria-hidden="true">
         {marker}
       </span>
