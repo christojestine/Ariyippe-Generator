@@ -1260,6 +1260,38 @@ select.field-input option {
   border-color: var(--well-border-hover);
 }
 
+/* Drag to reorder: grab anywhere on a card that is not being edited. */
+.item-card.is-draggable {
+  position: relative;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.item-card.is-draggable .item-actions {
+  cursor: default;
+}
+
+.item-stack.is-reordering,
+.item-stack.is-reordering .item-card {
+  cursor: grabbing;
+}
+
+/* Transitions only while dragging, so the drop snaps into the new order. */
+.item-stack.is-reordering .item-card {
+  transition:
+    transform 0.18s ease,
+    border-color 0.15s;
+}
+
+.item-stack.is-reordering .item-card.is-dragging {
+  z-index: 2;
+  transition: none;
+  border-color: var(--section-line, var(--accent-line));
+  box-shadow: var(--sheet-shadow);
+}
+
 .item-card.is-editing {
   grid-template-columns: 24px 1fr;
   border-color: var(--section-line, var(--accent-line));
